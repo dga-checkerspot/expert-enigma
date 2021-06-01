@@ -21,7 +21,7 @@ process minimapS31 {
 	
 
     """
-	minimap2 -ax sr  "$genom ${pair_id}_R1_001.fastq.gz" "${pair_id}_R2_001.fastq.gz" > aln.sam
+	minimap2 -ax sr  $genom "${pair_id}_R1_001.fastq.gz" "${pair_id}_R2_001.fastq.gz" > aln.sam
 	samtools view -bS aln.sam > aln.bam
 	samtools sort aln.bam > aln.sorted.bam
 	rm -f aln.sam
