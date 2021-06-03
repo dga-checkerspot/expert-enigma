@@ -23,7 +23,7 @@ process Augustus {
 	file 'aug.gtf' into abinitio
 	
 	"""
-	augustus --species chlorella $genom > aug.gtf
+	augustus --species=chlorella $genom > aug.gtf
 	
 	"""
 	
