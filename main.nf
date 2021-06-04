@@ -34,6 +34,7 @@ process gth {
 	gff2gbSmallDNA.pl bonafide.gtf genome.fa 10000 bonafide.gb
 	"""
 
+}
 
 
 
