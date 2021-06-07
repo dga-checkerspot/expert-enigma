@@ -57,7 +57,7 @@ process Augustus {
 
 process STARALIGN {
 
-	memory '16G'
+	memory '48G'
 
 	input:
 	tuple val(pair_id), path(reads) from read_pairs_ch
@@ -80,7 +80,7 @@ process STARALIGN {
 
 process merge {
 
-	memory '16G'
+	memory '64G'
 
 	input:
 	tuple val(pair_id), path(fileList) from align_ch.collect()
