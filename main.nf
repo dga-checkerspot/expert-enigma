@@ -70,7 +70,7 @@ process STARALIGN {
 
     """
     STAR --runMode genomeGenerate --genomeDir /opt --genomeFastaFiles $genom --sjdbGTFfile $genes --sjdbOverhang 99 --genomeSAindexNbases 10
-    STAR --genomeDir /opt --outFileNamePrefix /opt/STAR --outSAMtype BAM SortedByCoordinate --readFilesCommand zcat --readFilesIn "${pair_id}_R1_001.fastq.gz" "${pair_id}_R2_001.fastq.gz" 
+    STAR --genomeDir /opt --outFileNamePrefix /opt/STAR --outSAMtype BAM SortedByCoordinate --readFilesCommand zcat --readFilesIn "${pair_id}_R1_001.fastq.gz" "${pair_id}_R2_001.fastq.gz" --limitBAMsortRAM 44000000000 
 
     """
 
