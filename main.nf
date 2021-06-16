@@ -28,12 +28,10 @@ process gth {
 	
 	output: 
 	file "${prot.baseName}.bonafide.gtf" into protHints
-	//file 'bonafide.gb' into protTrain
 	
 	"""
 	startAlign.pl --genome=$genom --prot=$prot --prg=gth
 	gth2gtf.pl align_gth/gth.concat.aln "${prot.baseName}.bonafide.gtf"
-	//gff2gbSmallDNA.pl bonafide.gtf $genom 300 bonafide.gb
 	"""
 
 }
