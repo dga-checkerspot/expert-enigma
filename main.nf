@@ -20,7 +20,7 @@ Proteins = Channel.fromPath(protein)
 
 process gth { 
 	
-	memory '8G'
+	memory '2G'
 	
 	input:
 	path genom from genome3
@@ -59,7 +59,7 @@ process Augustus {
 
 process STARALIGN {
 
-	memory '48G'
+	memory '4G'
 
 	input:
 	tuple val(pair_id), path(reads) from read_pairs_ch
@@ -82,7 +82,7 @@ process STARALIGN {
 
 process merge {
 
-	memory '64G'
+	memory '16G'
 
 	input:
 	tuple val(pair_id), path(fileList) from align_ch.collect()
