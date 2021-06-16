@@ -5,7 +5,7 @@ pairInt='s3://transcriptomepipeline/PairInterleaves.sh'
 genome='s3://hic.genome/PGA_scaffolds.fa'
 genome2='s3://hic.genome/PGA_scaffolds.fa'
 genome3='s3://hic.genome/PGA_scaffolds.fa'
-protein='s3://hic.genome/GCF_000733215.1_ASM73321v1_protein.faa'
+protein='s3://hic.genome/*protein.faa'
 
 
 Channel
@@ -13,6 +13,8 @@ Channel
 	.ifEmpty {error "Cannot find any reads matching: ${params.reads}"}
 	.set { read_pairs_ch }
 
+
+Proteins = Channel.fromPath(protein)
 
 //First do genomethreader
 
@@ -22,16 +24,16 @@ process gth {
 	
 	input:
 	path genom from genome3
-	path prot from protein
+	path prot from Proteins
 	
 	output: 
-	file 'bonafide.gtf' into protHints
-	file 'bonafide.gb' into protTrain
+	file "${prot.baseName}.bonafide.gtf" into protHints
+	//file 'bonafide.gb' into protTrain
 	
 	"""
 	startAlign.pl --genome=$genom --prot=$prot --prg=gth
-	gth2gtf.pl align_gth/gth.concat.aln bonafide.gtf
-	gff2gbSmallDNA.pl bonafide.gtf $genom 300 bonafide.gb
+	gth2gtf.pl align_gth/gth.concat.aln "${prot.baseName}.bonafide.gtf"
+	//gff2gbSmallDNA.pl bonafide.gtf $genom 300 bonafide.gb
 	"""
 
 }
