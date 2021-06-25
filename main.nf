@@ -120,7 +120,7 @@ process bonafide {
 
 	ln -s genemark.f.good.gtf bonafide.gtf
 
-	gff2gbSmallDNA.pl $genes genome.fa 300 tmp.gb
+	gff2gbSmallDNA.pl $genes $genom 300 tmp.gb
 
 	filterGenesIn_mRNAname.pl bonafide.gtf tmp.gb > bonafide.gb
 
