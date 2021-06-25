@@ -5,6 +5,7 @@ pairInt='s3://transcriptomepipeline/PairInterleaves.sh'
 genome='s3://hic.genome/PGA_scaffolds.fa'
 genome2='s3://hic.genome/PGA_scaffolds.fa'
 genome3='s3://hic.genome/PGA_scaffolds.fa'
+genome4='s3://hic.genome/PGA_scaffolds.fa'
 protein='s3://hic.genome/*protein.faa'
 
 
@@ -37,7 +38,6 @@ process gth {
 }
 
 
-
 process Augustus {
 
 	input:
@@ -54,6 +54,8 @@ process Augustus {
 
 }
 
+abinitio.into{abinitio1; abinitio2}
+
 
 process STARALIGN {
 
@@ -62,7 +64,7 @@ process STARALIGN {
 	input:
 	tuple val(pair_id), path(reads) from read_pairs_ch
 	path genom from genome2
-	path genes from abinitio
+	path genes from abinitio1
 	
 	output:
 	set pair_id, "STARAligned.sortedByCoord.out.bam" into align_ch
@@ -75,7 +77,6 @@ process STARALIGN {
     """
 
 }
-
 
 
 process merge {
@@ -96,9 +97,36 @@ process merge {
 	"""
 }
 
+process bonafide {
 
+	memory '8G'
+	
+	input:
+	path bam from merged_bam
+	path genom from genome4
+	path genes from abinitio2
+	
+	output:
+	file 'bonafide.gtf' into RNA_gtf
+	file 'bonafide.gb' into RNA_gb
+	
+	"""
+	
+	bam2hints --intronsonly --in=$bam --out=introns.gff
 
+	filterIntronsFindStrand.pl $genom introns.gff --score > introns.f.gff
 
+	filterGenemark.pl --genemark=$genes --introns=introns.f.gff
+
+	ln -s genemark.f.good.gtf bonafide.gtf
+
+	gff2gbSmallDNA.pl genemark.gtf genome.fa 300 tmp.gb
+
+	filterGenesIn_mRNAname.pl bonafide.gtf tmp.gb > bonafide.gb
+
+	"""
+	
+}
 
 
 
