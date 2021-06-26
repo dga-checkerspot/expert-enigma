@@ -118,11 +118,10 @@ process bonafide {
 
 	filterGenemark.pl --genemark=$genes --introns=introns.f.gff
 
-	ln -s genemark.f.good.gtf bonafide.gtf
+	ln -s aug.f.good.gtf bonafide.gtf
 
-	gff2gbSmallDNA.pl $genes $genom 300 tmp.gb
+	gff2gbSmallDNA.pl $genes $genom 300 bonafide.gb
 
-	filterGenesIn_mRNAname.pl bonafide.gtf tmp.gb > bonafide.gb
 
 	"""
 	
