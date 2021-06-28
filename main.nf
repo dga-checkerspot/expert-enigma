@@ -6,7 +6,9 @@ genome='s3://hic.genome/PGA_scaffolds.fa'
 genome2='s3://hic.genome/PGA_scaffolds.fa'
 genome3='s3://hic.genome/PGA_scaffolds.fa'
 genome4='s3://hic.genome/PGA_scaffolds.fa'
+genome5='s3://hic.genome/PGA_scaffolds.fa'
 protein='s3://hic.genome/*protein.faa'
+cdnafile='s3://hic.genome/AWSBatch_transcriptome.fasta'
 
 
 Channel
@@ -126,6 +128,43 @@ process merge {
 	
 	"""
 }
+
+
+process wiggle { 
+
+	memory '4G'
+	
+	input:
+	path merged from merged_bam
+	
+	output:
+	file 'rnaseq.gff' into rnaHints
+	
+	"""
+	bam2wig $merged > rnaseq.wig
+	cat rnaseq.wig | wig2hints.pl --width=10 --margin=10 --minthresh=2 --minscore=4 --prune=0.1 --src=W --type=ep --UCSC=unstranded.track --radius=4.5 --pri=4 --strand="." > rnaseq.gff
+	"""
+}
+
+process cdna {
+
+	memory '4G'
+	
+	input:
+	path transcriptome from cdnafile
+	path genome from genome5
+	
+	output:
+	file 'cdna.hints' into cdnaHints
+	
+	
+	"""
+	blat -noHead -minIdentity=88 $genome $transcriptome blat_cdna.psl
+
+	blat2hints.pl --in=blat_cdna.psl --out=cdna.hints --minintronlen=35
+	"""
+}
+
 
 process bonafide {
 
