@@ -51,6 +51,23 @@ process gtHints {
 	"""
 }
 
+process gthMerge {
+	memory '2G'
+	
+	input:
+	path hints from gtHintsFiles.collect()
+	
+	output:
+	file "gtHints.merge.hints" into mergeGtHints
+	
+	
+	"""
+	cat *.hints > gtHints.merge.hints
+	"""
+	
+}
+	
+
 process Augustus {
 
 	input:
