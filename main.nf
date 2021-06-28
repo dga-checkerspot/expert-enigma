@@ -37,6 +37,19 @@ process gth {
 
 }
 
+process gtHints {
+	memory '2G'
+	
+	input:
+	path gtf from protHints
+	
+	output:
+	file "${gtf.baseName}.hints" into gtHintsFiles
+	
+	"""
+	align2hints.pl --in=$gtf --out=${gtf.baseName}.hints --prg=gth
+	"""
+}
 
 process Augustus {
 
