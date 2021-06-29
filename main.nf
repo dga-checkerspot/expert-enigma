@@ -4,8 +4,6 @@ params.reads='s3://algaetranscriptomics/CHK*_R{1,2}_001.fastq.gz'
 pairInt='s3://transcriptomepipeline/PairInterleaves.sh'
 geno='s3://hic.genome/PGA_scaffolds.fa'
 
-geno.into{genome; genome1 ; genome2 ; genome3 ; genome4 ; genome5 ; genome6}
-
 prot='s3://hic.genome/*protein.faa'
 cdna='s3://hic.genome/AWSBatch_transcriptome.fasta'
 
@@ -21,7 +19,28 @@ Channel
 
 Proteins = Channel.fromPath(protein)
 
-//First do genomethreader
+//Do repeatmasker
+
+process repeatMask {
+	memory '4G'
+	
+	input:
+	path genome from geno
+	
+	output:
+	file "${genome.baseName}.fa.masked" into maskedGenome
+	
+	"""
+	RepeatMasker --species arabidopsis -xsmall $genome 
+	"""
+	
+}
+
+maskedGenome.into{genome; genome1 ; genome2 ; genome3 ; genome4 ; genome5 ; genome6}
+
+
+
+//Do genomethreader
 
 process gth { 
 	
