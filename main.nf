@@ -8,7 +8,7 @@ prot='s3://hic.genome/*protein.faa'
 cdna='s3://hic.genome/AWSBatch_transcriptome.fasta'
 
 prot.into{protein; protein1}
-cdna.into{cdnafile,cdnafile1}
+cdna.into{cdnafile; cdnafile1}
 
 
 Channel
