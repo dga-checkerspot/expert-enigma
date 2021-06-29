@@ -166,6 +166,23 @@ process cdna {
 }
 
 
+process AllHints {
+
+	memory '4G'
+
+	input:
+	path cdna from cdnaHints
+	path rna from rnaHints
+	path prot from mergeGtHints
+	
+	output:
+	file 'mergedAllHints.hints' into hintsFile
+	
+	"""
+	cat $cdna $rna $prot > mergedAllHints.hints
+	"""
+
+
 process bonafide {
 
 	memory '8G'
