@@ -9,8 +9,8 @@ geno.into{genome; genome1 ; genome2 ; genome3 ; genome4 ; genome5 ; genome6}
 prot='s3://hic.genome/*protein.faa'
 cdna='s3://hic.genome/AWSBatch_transcriptome.fasta'
 
-prot.into(protein; protein1)
-cdna.into(cdnafile,cdnafile1)
+prot.into{protein; protein1}
+cdna.into{cdnafile,cdnafile1}
 
 
 Channel
