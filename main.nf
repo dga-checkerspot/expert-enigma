@@ -2,13 +2,15 @@
 
 params.reads='s3://algaetranscriptomics/CHK*_R{1,2}_001.fastq.gz'
 pairInt='s3://transcriptomepipeline/PairInterleaves.sh'
-genome='s3://hic.genome/PGA_scaffolds.fa'
-genome2='s3://hic.genome/PGA_scaffolds.fa'
-genome3='s3://hic.genome/PGA_scaffolds.fa'
-genome4='s3://hic.genome/PGA_scaffolds.fa'
-genome5='s3://hic.genome/PGA_scaffolds.fa'
-protein='s3://hic.genome/*protein.faa'
-cdnafile='s3://hic.genome/AWSBatch_transcriptome.fasta'
+geno='s3://hic.genome/PGA_scaffolds.fa'
+
+geno.into{genome; genome1 ; genome2 ; genome3 ; genome4 ; genome5 ; genome6}
+
+prot='s3://hic.genome/*protein.faa'
+cdna='s3://hic.genome/AWSBatch_transcriptome.fasta'
+
+prot.into(protein; protein1)
+cdna.into(cdnafile,cdnafile1)
 
 
 Channel
@@ -220,20 +222,21 @@ process runAnnotation {
 	memory '8G'
 	
 	input:
-	genome
-	bonafide
-	hints
+	path genome from genome5
+	path bonafide from RNA_gb
+	path hints from hintsFile
+	path cdna from cdnafile1
 	
 	output:
-	gff
-	trained dir
+	file 'bug_optimized_hints.gff' into gff
+	trained 'bug.zip' into config_dir
 	
 	"""
 	AUGUSTUS_CONFIG_PATH=/root/miniconda3/config
 	export AUGUSTUS_CONFIG_PATH
 	new_species.pl --species=bug
 
-	randomSplit.pl bonafide.gb 1000
+	randomSplit.pl $bonafide 1000
 	mv bonafide.gb.test test.gb
 	mv bonafide.gb.train train.gb
 	etraining --species=bug train.gb &> etrain.out
@@ -243,20 +246,20 @@ process runAnnotation {
 	etraining --species=bug train.gb &> etrain.out
 	augustus --species=bug test.gb > test.opt.out
 	
-	blat -noHead -minIdentity=88 PGA_scaffolds.fa AWSBatch_transcriptome.fasta blat_cdna.psl
+	blat -noHead -minIdentity=88 $genome $cdna blat_cdna.psl
 	blat2hints.pl --in=blat_cdna.psl --out=cdna.hints --minintronlen=35
-	augustus --species=chlamydomonas --extrinsicCfgFile=/root/miniconda3/config/extrinsic/extrinsic.E.cfg --hintsfile=cdna.hints --softmasking=off PGA_scaffolds.fa > chlamy_CDNA_hints.gff
+	augustus --species=chlamydomonas --extrinsicCfgFile=/root/miniconda3/config/extrinsic/extrinsic.E.cfg --hintsfile=cdna.hints --softmasking=off $genome > chlamy_CDNA_hints.gff
 	
 	cat chlamy_CDNA_hints.gff | perl -ne 'if (/\ttranscript\t.*\t(\S+)/){$tx=$1;} if (/transcript supported.*100/) {print "$tx\n";}' | tee supported.lst | wc -l
-	gff2gbSmallDNA.pl --good=supported.lst chlamy_CDNA_hints.gff PGA_scaffolds.fa 800 chlamy_bonafide.gb
+	gff2gbSmallDNA.pl --good=supported.lst chlamy_CDNA_hints.gff $genome 800 chlamy_bonafide.gb
 	optimize_augustus.pl --species=bug --rounds=3 chlamy_bonafide.gb --UTR=on --metapars=/root/miniconda3/config/species/bug/bug_metapars.utr.cfg --trainOnlyUtr=1
 
-	augustus --species=bug --extrinsicCfgFile=/root/miniconda3/config/extrinsic/extrinsic.M.RM.E.W.P.cfg --hintsfile=hints.hints --softmasking=on --UTR=on --print_utr=on --alternatives-from-sampling=true --alternatives-from-evidence=true PGA_scaffolds.fa.masked > bug_optimized_hints.gff
-	
-	
+	augustus --species=bug --extrinsicCfgFile=/root/miniconda3/config/extrinsic/extrinsic.M.RM.E.W.P.cfg --hintsfile=$hints --softmasking=on --UTR=on --print_utr=on --alternatives-from-sampling=true --alternatives-from-evidence=true $genome > bug_optimized_hints.gff
+	cp /root/miniconda3/config/bug ./bug/
+	zip bug
 	"""
 
-
+}
 
 
 
