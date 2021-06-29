@@ -182,6 +182,7 @@ process AllHints {
 	cat $cdna $rna $prot > mergedAllHints.hints
 	"""
 
+}
 
 process bonafide {
 
@@ -212,6 +213,52 @@ process bonafide {
 	"""
 	
 }
+
+
+process runAnnotation {
+
+	memory '8G'
+	
+	input:
+	genome
+	bonafide
+	hints
+	
+	output:
+	gff
+	trained dir
+	
+	"""
+	AUGUSTUS_CONFIG_PATH=/root/miniconda3/config
+	export AUGUSTUS_CONFIG_PATH
+	new_species.pl --species=bug
+
+	randomSplit.pl bonafide.gb 1000
+	mv bonafide.gb.test test.gb
+	mv bonafide.gb.train train.gb
+	etraining --species=bug train.gb &> etrain.out
+	augustus --species=bug test.gb > test.out
+	
+	optimize_augustus.pl --species=bug --rounds=12 --kfold=16 train.gb > optimize.out
+	etraining --species=bug train.gb &> etrain.out
+	augustus --species=bug test.gb > test.opt.out
+	
+	blat -noHead -minIdentity=88 PGA_scaffolds.fa AWSBatch_transcriptome.fasta blat_cdna.psl
+	blat2hints.pl --in=blat_cdna.psl --out=cdna.hints --minintronlen=35
+	augustus --species=chlamydomonas --extrinsicCfgFile=/root/miniconda3/config/extrinsic/extrinsic.E.cfg --hintsfile=cdna.hints --softmasking=off PGA_scaffolds.fa > chlamy_CDNA_hints.gff
+	
+	cat chlamy_CDNA_hints.gff | perl -ne 'if (/\ttranscript\t.*\t(\S+)/){$tx=$1;} if (/transcript supported.*100/) {print "$tx\n";}' | tee supported.lst | wc -l
+	gff2gbSmallDNA.pl --good=supported.lst chlamy_CDNA_hints.gff PGA_scaffolds.fa 800 chlamy_bonafide.gb
+	optimize_augustus.pl --species=bug --rounds=3 chlamy_bonafide.gb --UTR=on --metapars=/root/miniconda3/config/species/bug/bug_metapars.utr.cfg --trainOnlyUtr=1
+
+	augustus --species=bug --extrinsicCfgFile=/root/miniconda3/config/extrinsic/extrinsic.M.RM.E.W.P.cfg --hintsfile=hints.hints --softmasking=on --UTR=on --print_utr=on --alternatives-from-sampling=true --alternatives-from-evidence=true PGA_scaffolds.fa.masked > bug_optimized_hints.gff
+	
+	
+	"""
+
+
+
+
 
 
 
