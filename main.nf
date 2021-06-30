@@ -7,8 +7,11 @@ geno='s3://hic.genome/PGA_scaffolds.fa'
 prot='s3://hic.genome/*protein.faa'
 cdna='s3://hic.genome/AWSBatch_transcriptome.fasta'
 
-prot.into{protein; protein1}
-cdna.into{cdnafile; cdnafile1}
+prot_datasets = Channel.fromPath(params.prot)
+prot_datasets.into{Proteins; protein1}
+
+cdna_datasets= Channel.fromPath(params.cdna)
+cdna_datasets.into{cdnafile; cdnafile1}
 
 
 Channel
@@ -16,8 +19,6 @@ Channel
 	.ifEmpty {error "Cannot find any reads matching: ${params.reads}"}
 	.set { read_pairs_ch }
 
-
-Proteins = Channel.fromPath(protein)
 
 //Do repeatmasker
 
