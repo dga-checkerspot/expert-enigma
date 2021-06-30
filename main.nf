@@ -4,8 +4,8 @@ params.reads='s3://algaetranscriptomics/CHK*_R{1,2}_001.fastq.gz'
 pairInt='s3://transcriptomepipeline/PairInterleaves.sh'
 geno='s3://hic.genome/PGA_scaffolds.fa'
 
-prot='s3://hic.genome/*protein.faa'
-cdna='s3://hic.genome/AWSBatch_transcriptome.fasta'
+params.prot='s3://hic.genome/*protein.faa'
+params.cdna='s3://hic.genome/AWSBatch_transcriptome.fasta'
 
 prot_datasets = Channel.fromPath(params.prot)
 prot_datasets.into{Proteins; protein1}
