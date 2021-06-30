@@ -249,7 +249,7 @@ process runAnnotation {
 	
 	output:
 	file 'bug_optimized_hints.gff' into gff
-	trained 'bug.zip' into config_dir
+	file 'bug.zip' into config_dir
 	
 	"""
 	AUGUSTUS_CONFIG_PATH=/root/miniconda3/config
