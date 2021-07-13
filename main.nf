@@ -239,6 +239,7 @@ process bonafide {
 
 process runAnnotation {
 
+	cpus 4
 	memory '8G'
 	
 	input:
@@ -256,13 +257,13 @@ process runAnnotation {
 	export AUGUSTUS_CONFIG_PATH
 	new_species.pl --species=bug
 
-	randomSplit.pl $bonafide 1000
+	randomSplit.pl $bonafide 3500
 	mv bonafide.gb.test test.gb
 	mv bonafide.gb.train train.gb
 	etraining --species=bug train.gb &> etrain.out
 	augustus --species=bug test.gb > test.out
 	
-	optimize_augustus.pl --species=bug --rounds=12 --kfold=16 train.gb > optimize.out
+	optimize_augustus.pl --species=bug --rounds=1 --kfold=1 --cpus=4 --jg=1 train.gb > optimize.out
 	etraining --species=bug train.gb &> etrain.out
 	augustus --species=bug test.gb > test.opt.out
 	
