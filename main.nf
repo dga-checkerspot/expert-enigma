@@ -249,8 +249,15 @@ process runAnnotation {
 	path cdna from cdnafile1
 	
 	output:
+	file 'etrain.out' into etrain
+	file 'test.out' into firsttest
+	file 'optimize.out' into optim
+	file 'test.opt.out' into secondtest
+	file 'cdna.hints' into cdnahints
+	file 'chlamy_CDNA_hints.gff' into chlamyhints
+	file 'chlamy_bonfide.gb' into chlamybonafide
 	file 'bug_optimized_hints.gff' into gff
-	file 'bug.zip' into config_dir
+	file 'bug.tag.gz' into config_dir
 	
 	"""
 	AUGUSTUS_CONFIG_PATH=/root/miniconda3/config
@@ -263,7 +270,7 @@ process runAnnotation {
 	etraining --species=bug train.gb &> etrain.out
 	augustus --species=bug test.gb > test.out
 	
-	optimize_augustus.pl --species=bug --rounds=1 --kfold=1 --cpus=4 --jg=1 train.gb > optimize.out
+	optimize_augustus.pl --species=bug --rounds=2 --kfold=4 --cpus=4 --jg=1 train.gb > optimize.out
 	etraining --species=bug train.gb &> etrain.out
 	augustus --species=bug test.gb > test.opt.out
 	
@@ -276,8 +283,8 @@ process runAnnotation {
 	optimize_augustus.pl --species=bug --rounds=3 chlamy_bonafide.gb --UTR=on --metapars=/root/miniconda3/config/species/bug/bug_metapars.utr.cfg --trainOnlyUtr=1
 
 	augustus --species=bug --extrinsicCfgFile=/root/miniconda3/config/extrinsic/extrinsic.M.RM.E.W.P.cfg --hintsfile=$hints --softmasking=on --UTR=on --print_utr=on --alternatives-from-sampling=true --alternatives-from-evidence=true $genome > bug_optimized_hints.gff
-	cp /root/miniconda3/config/bug ./bug/
-	zip bug
+	cp -r /root/miniconda3/config/bug ./bug/
+	tar -zcvf bug
 	"""
 
 }
