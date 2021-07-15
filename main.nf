@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 params.reads='s3://algaetranscriptomics/CHK*_R{1,2}_001.fastq.gz'
-pairInt='s3://transcriptomepipeline/PairInterleaves.sh'
+perlAnnot='s3://hic.genome/perlAnnotation.sh'
 geno='s3://hic.genome/PGA_scaffolds.fa'
 
 params.prot='s3://hic.genome/*protein.faa'
@@ -247,6 +247,7 @@ process runAnnotation {
 	path bonafide from RNA_gb
 	path hints from hintsFile
 	path cdna from cdnafile1
+	path script from perlAnnot
 	
 	output:
 	file 'etrain.out' into etrain
@@ -278,9 +279,9 @@ process runAnnotation {
 	blat2hints.pl --in=blat_cdna.psl --out=cdna.hints --minintronlen=35
 	augustus --species=chlamydomonas --extrinsicCfgFile=/root/miniconda3/config/extrinsic/extrinsic.E.cfg --hintsfile=cdna.hints --softmasking=off $genome > chlamy_CDNA_hints.gff
 	
-	$/
-	cat chlamy_CDNA_hints.gff | perl -ne 'if (/\ttranscript\t.*\t(\S+)/){$tx=$1;} if (/transcript supported.*100/) {print "$tx\n";}' | tee supported.lst | wc -l
-	/$
+	chmod 777 $script
+	./$script
+	
 	gff2gbSmallDNA.pl --good=supported.lst chlamy_CDNA_hints.gff $genome 800 chlamy_bonafide.gb
 	optimize_augustus.pl --species=bug --rounds=3 chlamy_bonafide.gb --UTR=on --metapars=/root/miniconda3/config/species/bug/bug_metapars.utr.cfg --trainOnlyUtr=1
 
