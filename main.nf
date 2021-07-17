@@ -287,7 +287,7 @@ process runAnnotation {
 
 	augustus --species=bug --extrinsicCfgFile=/root/miniconda3/config/extrinsic/extrinsic.M.RM.E.W.P.cfg --hintsfile=$hints --softmasking=on --UTR=on --print_utr=on --alternatives-from-sampling=true --alternatives-from-evidence=true $genome > bug_optimized_hints.gff
 	cp -r /root/miniconda3/config/species/bug ./bug/
-	tar -zcvf bug
+	tar -zcvf bug.tar.gz bug
 	"""
 
 }
