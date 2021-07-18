@@ -250,13 +250,6 @@ process runAnnotation {
 	path script from perlAnnot
 	
 	output:
-	file 'etrain.out' into etrain
-	file 'test.out' into firsttest
-	file 'optimize.out' into optim
-	file 'test.opt.out' into secondtest
-	file 'cdna.hints' into cdnahints
-	file 'chlamy_CDNA_hints.gff' into chlamyhints
-	file 'chlamy_bonfide.gb' into chlamybonafide
 	file 'bug_optimized_hints.gff' into gff
 	file 'bug.tag.gz' into config_dir
 	
