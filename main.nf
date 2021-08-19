@@ -13,6 +13,7 @@ prot_datasets.into{Proteins; protein1}
 cdna_datasets= Channel.fromPath(params.cdna)
 cdna_datasets.into{cdnafile; cdnafile1}
 
+geno=Channel.fromPath(params.geno)
 
 Channel
 	.fromFilePairs(params.reads)
