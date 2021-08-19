@@ -2,7 +2,7 @@
 
 params.reads='s3://algaetranscriptomics/CHK*_R{1,2}_001.fastq.gz'
 perlAnnot='s3://hic.genome/perlAnnotation.sh'
-params.geno='s3://hic.genome/ragoo.secondary.fasta'
+params.geno='s3://hic.genome/ragoo_secondary.fasta'
 
 params.prot='s3://hic.genome/*protein.faa'
 params.cdna='s3://hic.genome/AWSBatch_transcriptome.fasta'
