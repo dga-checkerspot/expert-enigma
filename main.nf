@@ -94,6 +94,7 @@ process gthMerge {
 	
 
 process Augustus {
+	memory '8G'
 
 	input:
 	path genom from genome
