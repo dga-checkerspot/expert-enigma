@@ -30,7 +30,7 @@ process repeatMask {
 	path genome from geno
 	
 	output:
-	file "${genome.baseName}.fa.masked" into maskedGenome
+	file "${genome.baseName}.fasta.masked" into maskedGenome
 	
 	"""
 	RepeatMasker --species arabidopsis -xsmall $genome 
