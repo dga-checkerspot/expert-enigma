@@ -244,7 +244,7 @@ process runAnnotation {
 	memory '8G'
 	
 	input:
-	path genome from genome5
+	path genome from genome6
 	path bonafide from RNA_gb
 	path hints from hintsFile
 	path cdna from cdnafile1
