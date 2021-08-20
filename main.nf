@@ -241,7 +241,6 @@ process bonafide {
 
 process runAnnotation {
 
-	cpus 4
 	memory '8G'
 	
 	input:
