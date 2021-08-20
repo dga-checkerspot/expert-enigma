@@ -2,7 +2,7 @@
 
 params.reads='s3://algaetranscriptomics/CHK*_R{1,2}_001.fastq.gz'
 pairInt='s3://transcriptomepipeline/PairInterleaves.sh'
-geno='s3://hic.genome/PGA_scaffolds.fa'
+geno='s3://hic.genome/PGA_scaffolds.fasta'
 
 params.prot='s3://hic.genome/*protein.faa'
 params.cdna='s3://hic.genome/AWSBatch_transcriptome.fasta'
