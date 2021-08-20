@@ -1,8 +1,8 @@
 #!/usr/bin/env nextflow
 
 params.reads='s3://algaetranscriptomics/CHK*_R{1,2}_001.fastq.gz'
-perlAnnot='s3://hic.genome/perlAnnotation.sh'
-params.geno='s3://hic.genome/PGA_scaffolds.fasta'
+pairInt='s3://transcriptomepipeline/PairInterleaves.sh'
+geno='s3://hic.genome/PGA_scaffolds.fa'
 
 params.prot='s3://hic.genome/*protein.faa'
 params.cdna='s3://hic.genome/AWSBatch_transcriptome.fasta'
@@ -13,7 +13,6 @@ prot_datasets.into{Proteins; protein1}
 cdna_datasets= Channel.fromPath(params.cdna)
 cdna_datasets.into{cdnafile; cdnafile1}
 
-geno=Channel.fromPath(params.geno)
 
 Channel
 	.fromFilePairs(params.reads)
@@ -30,7 +29,7 @@ process repeatMask {
 	path genome from geno
 	
 	output:
-	file "${genome.baseName}.fasta.masked" into maskedGenome
+	file "${genome.baseName}.fa.masked" into maskedGenome
 	
 	"""
 	RepeatMasker --species arabidopsis -xsmall $genome 
@@ -94,7 +93,6 @@ process gthMerge {
 	
 
 process Augustus {
-	memory '8G'
 
 	input:
 	path genom from genome
@@ -129,7 +127,6 @@ process STARALIGN {
     """
     STAR --runMode genomeGenerate --genomeDir /opt --genomeFastaFiles $genom --sjdbGTFfile $genes --sjdbOverhang 99 --genomeSAindexNbases 10
     STAR --genomeDir /opt --outFileNamePrefix STAR --outSAMtype BAM SortedByCoordinate --readFilesCommand zcat --readFilesIn "${pair_id}_R1_001.fastq.gz" "${pair_id}_R2_001.fastq.gz" --limitBAMsortRAM 44000000000 
-
     """
 
 }
@@ -184,7 +181,6 @@ process cdna {
 	
 	"""
 	blat -noHead -minIdentity=88 $genome $transcriptome blat_cdna.psl
-
 	blat2hints.pl --in=blat_cdna.psl --out=cdna.hints --minintronlen=35
 	"""
 }
@@ -224,19 +220,14 @@ process bonafide {
 	"""
 	
 	bam2hints --intronsonly --in=$bam --out=introns.gff
-
 	filterIntronsFindStrand.pl $genom introns.gff --score > introns.f.gff
-
 	filterGenemark.pl --genemark=$genes --introns=introns.f.gff
-
 	ln -s aug.f.good.gtf bonafide.gtf
-
 	gff2gbSmallDNA.pl $genes $genom 300 bonafide.gb
-
-
 	"""
 	
 }
+
 
 
 process runAnnotation {
@@ -258,7 +249,6 @@ process runAnnotation {
 	AUGUSTUS_CONFIG_PATH=/root/miniconda3/config
 	export AUGUSTUS_CONFIG_PATH
 	new_species.pl --species=bug
-
 	randomSplit.pl $bonafide 3500
 	mv bonafide.gb.test test.gb
 	mv bonafide.gb.train train.gb
@@ -278,15 +268,12 @@ process runAnnotation {
 	
 	gff2gbSmallDNA.pl --good=supported.lst chlamy_CDNA_hints.gff $genome 800 chlamy_bonafide.gb
 	optimize_augustus.pl --species=bug --rounds=3 chlamy_bonafide.gb --UTR=on --metapars=/root/miniconda3/config/species/bug/bug_metapars.utr.cfg --trainOnlyUtr=1
-
 	augustus --species=bug --extrinsicCfgFile=/root/miniconda3/config/extrinsic/extrinsic.M.RM.E.W.P.cfg --hintsfile=$hints --softmasking=on --UTR=on --print_utr=on --alternatives-from-sampling=true --alternatives-from-evidence=true $genome > bug_optimized_hints.gff
 	cp -r /root/miniconda3/config/species/bug ./bug/
 	tar -zcvf bug.tar.gz bug
 	"""
 
 }
-
-
 
 
 
