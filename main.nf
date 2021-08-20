@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
 params.reads='s3://algaetranscriptomics/CHK*_R{1,2}_001.fastq.gz'
+perlAnnot='s3://hic.genome/perlAnnotation.sh'
 pairInt='s3://transcriptomepipeline/PairInterleaves.sh'
 geno='s3://hic.genome/PGA_scaffolds.fasta'
 
