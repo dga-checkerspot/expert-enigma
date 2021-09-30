@@ -269,7 +269,7 @@ process runAnnotation {
 	
 	gff2gbSmallDNA.pl --good=supported.lst chlamy_CDNA_hints.gff $genome 800 chlamy_bonafide.gb
 	optimize_augustus.pl --species=bug --rounds=3 chlamy_bonafide.gb --UTR=on --metapars=/root/miniconda3/config/species/bug/bug_metapars.utr.cfg --trainOnlyUtr=1
-	augustus --species=bug --extrinsicCfgFile=/root/miniconda3/config/extrinsic/extrinsic.M.RM.E.W.P.cfg --hintsfile=$hints --softmasking=on --UTR=on --print_utr=on --alternatives-from-sampling=true --alternatives-from-evidence=true $genome > bug_optimized_hints.gff
+	augustus --species=bug --extrinsicCfgFile=/root/miniconda3/config/extrinsic/extrinsic.M.RM.E.W.P.cfg --hintsfile=$hints --softmasking=on --UTR=on --print_utr=on --codingseq=on $genome > bug_optimized_hints.gff
 	cp -r /root/miniconda3/config/species/bug ./bug/
 	tar -zcvf bug.tar.gz bug
 	"""
