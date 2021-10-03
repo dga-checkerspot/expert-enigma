@@ -114,7 +114,7 @@ abinitio.into{abinitio1; abinitio2}
 
 process STARALIGN {
 
-	memory '16G'
+	memory '32G'
 
 	input:
 	tuple val(pair_id), path(reads) from read_pairs_ch
